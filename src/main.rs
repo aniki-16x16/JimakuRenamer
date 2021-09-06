@@ -28,6 +28,8 @@ fn main() {
         )
         .get_matches();
     let path = Path::new(matches.value_of("path").unwrap());
+    let video_re = Regex::new(matches.value_of("video").unwrap_or("(mp4|mkv)$")).unwrap();
+    let subtitle_re = Regex::new(matches.value_of("subtitle").unwrap_or("(ass|srt)$")).unwrap();
 
     let mut files = fs::read_dir(path)
         .expect("文件夹不存在")
@@ -44,30 +46,10 @@ fn main() {
     let mut videos = vec![];
     let mut subtitles = vec![];
     for file in &files {
-        let extension = file.split('.').last().unwrap();
-        match matches.value_of("video") {
-            None => {
-                if ["mp4", "mkv"].contains(&extension) {
-                    videos.push(file);
-                }
-            },
-            Some(re) => {
-                if Regex::new(re).unwrap().is_match(file) {
-                    videos.push(file);
-                }
-            }
-        }
-        match matches.value_of("subtitle") {
-            None => {
-                if ["ass", "srt"].contains(&extension) {
-                    subtitles.push(file);
-                }
-            },
-            Some(re) => {
-                if Regex::new(re).unwrap().is_match(file) {
-                    subtitles.push(file);
-                }
-            }
+        if video_re.is_match(file) {
+            videos.push(file);
+        } else if subtitle_re.is_match(file) {
+            subtitles.push(file);
         }
     }
     if videos.len() != subtitles.len() {
