@@ -1,6 +1,6 @@
 [package]
 name = "jimaku"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["aniki-16x16 <aniki_16x16@outlook.com>"]
 edition = "2018"
 
