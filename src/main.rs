@@ -45,20 +45,27 @@ fn main() {
 
     let mut videos = vec![];
     let mut subtitles = vec![];
-    for file in &files {
-        if video_re.is_match(file) {
+    for file in files {
+        if video_re.is_match(&file) {
             videos.push(file);
-        } else if subtitle_re.is_match(file) {
+        } else if subtitle_re.is_match(&file) {
             subtitles.push(file);
         }
     }
     if videos.len() != subtitles.len() {
-        println!("视频与字幕数量不匹配，请尝试使用正则");
+        for i in 0..videos.len().max(subtitles.len()) {
+            println!("{}\t{}", videos.get(i).unwrap_or(&"-".to_string()), subtitles.get(i).unwrap_or(&"NO_FILE".to_string()));
+        }
+        println!("视频与字幕需要一一对应，请使用正则进行过滤");
         exit(1);
     }
 
     for i in 0..subtitles.len() {
-        let target_name = videos[i].split('.').rev().last().unwrap();
+        let target_name = {
+            let mut tmp: Vec<_> = videos[i].split('.').collect();
+            tmp.pop();
+            tmp.join(".")
+        };
         let extension = subtitles[i].split('.').last().unwrap();
         fs::rename(
             path.join(subtitles[i].clone()),
